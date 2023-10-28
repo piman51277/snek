@@ -16,32 +16,6 @@ SnekRenderer::SnekRenderer()
 
   game = new SnekGame();
 
-  /**
-    SDL_TimerCallback tickCallback = [](uint32_t interval, void *param) -> uint32_t
-    {
-      SnekGame *game = (SnekGame *)param;
-      game->nextTick();
-
-      if (game->game_over)
-      {
-        if (game->score == 64)
-        {
-          std::cout << "Won in " << game->ticks << " ticks!" << std::endl;
-        }
-        else
-        {
-          std::cout << "Lost in " << game->ticks << " ticks!" << std::endl;
-        }
-        game->reset();
-      }
-
-      return interval;
-    };
-
-    SDL_AddTimer(20, tickCallback, game);
-
-    */
-
   SDL_TimerCallback renderCallback = [](uint32_t interval, void *param) -> uint32_t
   {
     SnekRenderer *renderer = (SnekRenderer *)param;
@@ -94,8 +68,6 @@ void SnekRenderer::drawSnek()
   Snek snek = game->snek;
   std::deque<uint8_t> x = snek.x;
 
-  SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-
   const int thickness = 60;
   const int cellSize = 110;
   const int cellOffset = 60;
@@ -106,14 +78,19 @@ void SnekRenderer::drawSnek()
     int x1 = (x[0] % 8) * cellSize + cellOffset;
     int y1 = (x[0] / 8) * cellSize + cellOffset;
 
+    SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+
     SDL_Rect rect = {x1 - thickness / 2, y1 - thickness / 2, thickness, thickness};
     SDL_RenderFillRect(renderer, &rect);
   }
   else
   {
     // for every pair of points, draw a "line" between them
+
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     for (int i = 0; i < x.size() - 1; i++)
     {
+
       // convert i to x and y
       int x1 = (x[i] % 8) * cellSize + cellOffset;
       int y1 = (x[i] / 8) * cellSize + cellOffset;
@@ -135,6 +112,14 @@ void SnekRenderer::drawSnek()
         SDL_RenderFillRect(renderer, &rect);
       }
     }
+
+    // make the head blue
+    int x1 = (x.back() % 8) * cellSize + cellOffset;
+    int y1 = (x.back() / 8) * cellSize + cellOffset;
+
+    SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+    SDL_Rect rect = {x1 - thickness / 2, y1 - thickness / 2, thickness, thickness};
+    SDL_RenderFillRect(renderer, &rect);
   }
 
   SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
