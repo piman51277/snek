@@ -7,6 +7,8 @@
 
 int main()
 {
+
+  // Comment these lines out for analysis mode
   SnekRenderer renderer;
   return 0;
 
