@@ -173,7 +173,7 @@ uint8_t snekAI(Snek snek, uint8_t food)
     // tail protection - don't go after the tail
     bool tailProtection = (tailStep < headStep && step < tailStep) || (tailStep > headStep && step > tailStep);
 
-    bool foodProtection = step < foodStep;
+    bool foodProtection = step <= foodStep;
 
     if (step > maxStep && step != -1 && isValid && !tailProtection && foodProtection)
     {
