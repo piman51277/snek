@@ -8,26 +8,29 @@ def getFrequencies(filename):
     data = np.loadtxt(filename, dtype=int)
 
     maxV = max(data)
+    minV = min(data)
 
-    freq = np.zeros(maxV + 1, dtype=int)
+    freq = np.zeros(maxV - minV + 1, dtype=int)
 
     for i in range(len(data)):
-        freq[data[i]] += 1
+        freq[data[i] - minV] += 1
 
-    return freq, maxV
+    return np.arange(minV, maxV + 1), freq
 
 
-freq, maxV = getFrequencies("data/resultsham.txt")
-plt.plot(np.arange(maxV + 1), freq, color="black")
+sz, freq = getFrequencies("data/resultsham.txt")
+plt.plot(sz, freq, color="black")
 
-freq, maxV = getFrequencies("data/resultsunopalgo.txt")
-plt.plot(np.arange(maxV + 1), freq, color="blue")
+sz, freq = getFrequencies("data/resultsunopalgo.txt")
+plt.plot(sz, freq,  color="blue")
 
-freq, maxV = getFrequencies("data/resultsalgo.txt")
-plt.plot(np.arange(maxV + 1), freq, color="red")
+sz, freq = getFrequencies("data/resultsalgo.txt")
+plt.plot(sz, freq,  color="red")
+
+plt.xlim(0, 1500)
 
 plt.legend(["Hamiltonian Cycle",
-           "Modified Cycle", "Modified Cycle + Hamiltonian"])
+           "Modified Cycle", "Modified Cycle + Endgame Hamiltonian"])
 
 plt.xlabel("Turns to Finish Game")
 plt.ylabel("Frequency")
