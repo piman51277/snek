@@ -2,6 +2,8 @@
 
 ## Installation
 
+> As of now, this project only supports Linux x86_64 systems
+
 This project requires the following dependencies:
 
 ```
