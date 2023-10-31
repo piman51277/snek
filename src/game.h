@@ -11,22 +11,22 @@ enum Direction
   LEFT
 };
 
-// board is 8x8
+// board is 20x20
 struct Snek
 {
-  std::deque<uint8_t> x;  // index of each cell in snek (in order)
-  std::bitset<64> x_mask; // each bit is 1 if snek occupies cell, 0 if not
-  uint8_t length;
+  std::deque<uint16_t> x;  // index of each cell in snek (in order)
+  std::bitset<400> x_mask; // each bit is 1 if snek occupies cell, 0 if not
+  uint16_t length;
   Direction direction;
 };
 
-uint8_t snekAI(Snek snek, uint8_t food);
+uint16_t snekAI(Snek snek, uint16_t food);
 
 class SnekGame
 {
 public:
   Snek snek;
-  uint8_t food;
+  uint16_t food;
   bool game_over;
   int score;
   int ticks;
@@ -40,5 +40,5 @@ private:
   void spawnFood();
   void growSnek();
   void moveSnek(Direction d);
-  void movePos(uint8_t c);
+  void movePos(uint16_t c);
 };

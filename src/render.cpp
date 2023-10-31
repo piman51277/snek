@@ -8,12 +8,11 @@ SnekRenderer::SnekRenderer()
   SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
   IMG_Init(IMG_INIT_PNG);
 
-  window = SDL_CreateWindow("snek", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 890, 890, SDL_WINDOW_SHOWN);
+  window = SDL_CreateWindow("snek", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 884, 884, SDL_WINDOW_SHOWN);
   renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-  background_sur = IMG_Load("img/background.png");
+  background_sur = IMG_Load("img/background-lg.png");
   background_tex = SDL_CreateTextureFromSurface(renderer, background_sur);
-  background_drawrect = {0, 0, 890, 890};
-
+  background_drawrect = {0, 0, 884, 884};
   game = new SnekGame();
 
   SDL_TimerCallback renderCallback = [](uint32_t interval, void *param) -> uint32_t
@@ -25,7 +24,7 @@ SnekRenderer::SnekRenderer()
 
     if (game->game_over)
     {
-      if (game->score == 64)
+      if (game->score == 400)
       {
         std::cout << "Won in " << game->ticks << " ticks!" << std::endl;
       }
@@ -42,7 +41,7 @@ SnekRenderer::SnekRenderer()
     return interval;
   };
 
-  SDL_AddTimer(1000 / 30, renderCallback, this);
+  SDL_AddTimer(1000 / 60, renderCallback, this);
 
   while (true)
   {
@@ -66,17 +65,17 @@ void SnekRenderer::drawBackground()
 void SnekRenderer::drawSnek()
 {
   Snek snek = game->snek;
-  std::deque<uint8_t> x = snek.x;
+  std::deque<uint16_t> x = snek.x;
 
-  const int thickness = 60;
-  const int cellSize = 110;
-  const int cellOffset = 60;
+  const int thickness = 18;
+  const int cellSize = 44;
+  const int cellOffset = 24;
 
   // special case for length 1
   if (x.size() == 1)
   {
-    int x1 = (x[0] % 8) * cellSize + cellOffset;
-    int y1 = (x[0] / 8) * cellSize + cellOffset;
+    int x1 = (x[0] % 20) * cellSize + cellOffset;
+    int y1 = (x[0] / 20) * cellSize + cellOffset;
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
 
@@ -92,11 +91,11 @@ void SnekRenderer::drawSnek()
     {
 
       // convert i to x and y
-      int x1 = (x[i] % 8) * cellSize + cellOffset;
-      int y1 = (x[i] / 8) * cellSize + cellOffset;
+      int x1 = (x[i] % 20) * cellSize + cellOffset;
+      int y1 = (x[i] / 20) * cellSize + cellOffset;
 
-      int x2 = (x[i + 1] % 8) * cellSize + cellOffset;
-      int y2 = (x[i + 1] / 8) * cellSize + cellOffset;
+      int x2 = (x[i + 1] % 20) * cellSize + cellOffset;
+      int y2 = (x[i + 1] / 20) * cellSize + cellOffset;
 
       // if the line is vertical
       if (x1 == x2)
@@ -114,8 +113,8 @@ void SnekRenderer::drawSnek()
     }
 
     // make the head blue
-    int x1 = (x.back() % 8) * cellSize + cellOffset;
-    int y1 = (x.back() / 8) * cellSize + cellOffset;
+    int x1 = (x.back() % 20) * cellSize + cellOffset;
+    int y1 = (x.back() / 20) * cellSize + cellOffset;
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
     SDL_Rect rect = {x1 - thickness / 2, y1 - thickness / 2, thickness, thickness};
@@ -126,8 +125,8 @@ void SnekRenderer::drawSnek()
 
   // draw food
 
-  int x1 = (game->food % 8) * cellSize + cellOffset;
-  int y1 = (game->food / 8) * cellSize + cellOffset;
+  int x1 = (game->food % 20) * cellSize + cellOffset;
+  int y1 = (game->food / 20) * cellSize + cellOffset;
 
   SDL_Rect rect = {x1 - thickness / 2, y1 - thickness / 2, thickness, thickness};
   SDL_RenderFillRect(renderer, &rect);

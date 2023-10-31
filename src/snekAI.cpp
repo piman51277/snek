@@ -1,102 +1,70 @@
 #include "game.h"
 #include <iostream>
 
-/**
- * The below is a path for a hamiltonian path on a 8x8 grid.
- * >>>>>>>v
- * ^v<<<<<<
- * ^>>>>>>v
- * ^v<<<<<<
- * ^>>>>>>v
- * ^v<<<<<<
- * ^>>>>>>v
- * ^<<<<<<<
- */
-
-// for each index, it is the index of the next cell in the path
-constexpr uint8_t hamiltonian[64] = {
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    15,
-    0,
-    17,
-    9,
-    10,
-    11,
-    12,
-    13,
-    14,
-    8,
-    18,
-    19,
-    20,
-    21,
-    22,
-    23,
-    31,
-    16,
-    33,
-    25,
-    26,
-    27,
-    28,
-    29,
-    30,
-    24,
-    34,
-    35,
-    36,
-    37,
-    38,
-    39,
-    47,
-    32,
-    49,
-    41,
-    42,
-    43,
-    44,
-    45,
-    46,
-    40,
-    50,
-    51,
-    52,
-    53,
-    54,
-    55,
-    63,
-    48,
-    56,
-    57,
-    58,
-    59,
-    60,
-    61,
-    62,
-};
-
-uint8_t snekAI(Snek snek, uint8_t food)
+uint16_t snekAI(Snek snek, uint16_t food)
 {
 
   static bool cached = false;
-  static int8_t cycleStep[64];
-  static int8_t neighbors[64][4];
+  static uint16_t hamiltonian[400];
+  static uint16_t cycleStep[400];
+  static int16_t neighbors[400][4];
 
-  uint8_t head = snek.x.back();
+  uint16_t head = snek.x.back();
 
-  std::bitset<64> snek_mask = snek.x_mask;
+  std::bitset<400> snek_mask = snek.x_mask;
 
   // remove the tail from the mask
   snek_mask[snek.x.front()] = 0;
 
   if (!cached)
   {
+    // build the hamiltonian cycle
+
+    // first line is
+    //>>>> ... >>>v
+    for (int i = 0; i <= 18; i++)
+    {
+      hamiltonian[i] = i + 1;
+    }
+    hamiltonian[19] = 19 + 20;
+
+    // next lines are alternating
+    //^v<<<<<<<<<<<<<<
+    //^>>>>>>>>>>>>>>v
+
+    for (int y = 1; y <= 18; y++)
+    {
+      if (y % 2 == 1)
+      {
+        hamiltonian[y * 20] = (y - 1) * 20;
+        hamiltonian[y * 20 + 1] = (y + 1) * 20 + 1;
+
+        for (int x = 2; x <= 19; x++)
+        {
+          hamiltonian[y * 20 + x] = y * 20 + x - 1;
+        }
+      }
+      else
+      {
+        hamiltonian[y * 20] = (y - 1) * 20;
+
+        for (int x = 1; x <= 19; x++)
+        {
+          hamiltonian[y * 20 + x] = y * 20 + x + 1;
+        }
+
+        hamiltonian[y * 20 + 19] = (y + 1) * 20 + 19;
+      }
+    }
+
+    // last line is
+    //^<<<<<<<<<<<
+    hamiltonian[19 * 20] = 18 * 20;
+    for (int i = 1; i <= 19; i++)
+    {
+      hamiltonian[19 * 20 + i] = 19 * 20 + i - 1;
+    }
+
     int k = 0;
     int step = 0;
     while (hamiltonian[k] != 0)
@@ -107,7 +75,7 @@ uint8_t snekAI(Snek snek, uint8_t food)
     }
     cycleStep[k] = step;
 
-    for (int i = 0; i < 64; i++)
+    for (int i = 0; i < 400; i++)
     {
       // default to -1
       neighbors[i][0] = -1;
@@ -115,14 +83,14 @@ uint8_t snekAI(Snek snek, uint8_t food)
       neighbors[i][2] = -1;
       neighbors[i][3] = -1;
 
-      if (i % 8 != 0)
+      if (i % 20 != 0)
         neighbors[i][0] = i - 1;
-      if (i % 8 != 7)
+      if (i % 20 != 19)
         neighbors[i][1] = i + 1;
-      if (i / 8 != 0)
-        neighbors[i][2] = i - 8;
-      if (i / 8 != 7)
-        neighbors[i][3] = i + 8;
+      if (i / 20 != 0)
+        neighbors[i][2] = i - 20;
+      if (i / 20 != 19)
+        neighbors[i][3] = i + 20;
     }
   }
 
@@ -152,7 +120,7 @@ uint8_t snekAI(Snek snek, uint8_t food)
   // if there is no food in the remaining cycle
   // or we already filled most of the board
   // just do regular hamiltonian path
-  if (snek.length > 32)
+  if (snek.length > 200)
     return hamiltonian[head];
 
   // find the neighbor with the largest step
@@ -165,7 +133,7 @@ uint8_t snekAI(Snek snek, uint8_t food)
 
     // if not, set a ghost food at the cycle reset
     if (!doOp)
-      foodStep = 63;
+      foodStep = 399;
 
     // we must never backtrack
     bool isValid = step > headStep;

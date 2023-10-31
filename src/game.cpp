@@ -31,7 +31,7 @@ SnekGame::~SnekGame(){
 void SnekGame::spawnFood()
 {
   // id the snek is full, don't spawn food
-  if (snek.length == 64)
+  if (snek.length == 400)
   {
     return;
   }
@@ -39,7 +39,7 @@ void SnekGame::spawnFood()
   while (true)
   {
     // attempt to spawn food at random location
-    food = rand() % 64;
+    food = rand() % 400;
 
     // check if food is in snek
     if (snek.x_mask[food] == 0)
@@ -66,7 +66,7 @@ void SnekGame::growSnek()
   }
 }
 
-void SnekGame::movePos(uint8_t new_head)
+void SnekGame::movePos(uint16_t new_head)
 {
 
   // check if snek is dead
@@ -76,7 +76,7 @@ void SnekGame::movePos(uint8_t new_head)
   }
 
   // is it colliding with itself?
-  std::bitset<64> snek_mask = snek.x_mask;
+  std::bitset<400> snek_mask = snek.x_mask;
 
   // remove the tail from the mask
   snek_mask[snek.x.front()] = 0;
@@ -104,8 +104,8 @@ void SnekGame::movePos(uint8_t new_head)
     snek.x.pop_front();
   }
 
-  // if we hit 64, we win
-  if (snek.length == 64)
+  // if we hit 400, we win
+  if (snek.length == 400)
   {
     game_over = true;
   }
@@ -115,34 +115,34 @@ void SnekGame::moveSnek(Direction d)
 {
 
   // get the current head
-  uint8_t head = snek.x.back();
+  uint16_t head = snek.x.back();
 
   // figure out where the new head is
-  uint8_t new_head = head;
+  uint16_t new_head = head;
 
   if (d == UP)
   {
-    if (head < 8)
+    if (head < 20)
     {
       game_over = true;
       return;
     }
 
-    new_head = head - 8;
+    new_head = head - 20;
   }
   else if (d == DOWN)
   {
-    if (head > 55)
+    if (head > 179)
     {
       game_over = true;
       return;
     }
 
-    new_head = head + 8;
+    new_head = head + 20;
   }
   else if (d == LEFT)
   {
-    if (head % 8 == 0)
+    if (head % 20 == 0)
     {
       game_over = true;
       return;
@@ -152,7 +152,7 @@ void SnekGame::moveSnek(Direction d)
   }
   else if (d == RIGHT)
   {
-    if ((head + 1) % 8 == 0)
+    if ((head + 1) % 20 == 0)
     {
       game_over = true;
       return;
@@ -167,7 +167,7 @@ void SnekGame::moveSnek(Direction d)
 void SnekGame::nextTick()
 {
   // get the next cell from the AI
-  uint8_t d = snekAI(snek, food);
+  uint16_t d = snekAI(snek, food);
 
   // move the snek
   movePos(d);
